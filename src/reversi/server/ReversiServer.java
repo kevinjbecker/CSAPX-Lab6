@@ -1,8 +1,5 @@
 package reversi.server;
-
-import com.sun.org.apache.xpath.internal.SourceTree;
-import com.sun.security.ntlm.Server;
-import reversi.Reversi;
+import reversi.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -11,10 +8,8 @@ import java.net.ServerSocket;
 import java.io.IOException;
 import java.net.Socket;
 
-public class ReversiServer
+public class ReversiServer implements ReversiProtocol
 {
-
-
     public static void main(String [] args)
     {
         int numRows, numCols, port;
@@ -33,33 +28,34 @@ public class ReversiServer
         }
     }
 
-    public static void gameIO(int numRows, int numCols, int port)
+    private static void gameIO(int numRows, int numCols, int port)
     {
         Reversi game = new Reversi(numRows, numCols);
 
-        ServerSocket server1 = null;
-        ServerSocket server2 = null;
+        ServerSocket server = null;
         Socket conn1 = null;
         Socket conn2 = null;
 
         try
         {
+            // Alerts the start of the program.
             System.out.println("Server is being initialized...");
-
-            server1 = new ServerSocket(port);
-            server2 = new ServerSocket(port);
-
+            // Initializes the server on port.
+            server = new ServerSocket(port);
+            // Alerts the user what port the server is on.
             System.out.println("Server initialized on port" + port + ".");
+
+            // Allows for player 1 to connect to server.
             System.out.print("Waiting for player 1 to connect...");
-
-            conn1 = server1.accept();
-
+            conn1 = server.accept();
             System.out.println("Player 1 connected.");
+
+            // Allows for player 2 to connect to server.
             System.out.print("Waiting for player 2 to connect...");
+            conn2 = server.accept();
+            System.out.println("Player 2 connected.\nGame is starting!");
 
-            conn2 = server2.accept();
-
-            System.out.println("Player 2 connected.\nGame will start now!");
+            // Starts running the game.
 
         }
         catch (IOException gameRunIOE)
@@ -73,10 +69,7 @@ public class ReversiServer
             try
             {
                 // Closing server1 if it's not already closed.
-                if (server1 != null) server1.close();
-
-                // Closing server2 if it's not already closed.
-                if (server2 != null) server2.close();
+                if (server != null) server.close();
 
                 // Closing conn1 if it's not already closed.
                 if (conn1 != null) conn1.close();
