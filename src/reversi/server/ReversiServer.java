@@ -21,15 +21,14 @@ public class ReversiServer implements ReversiProtocol
         if(args.length < 3)
         {
             System.out.println("Invalid number of arguments.\nUsage: java ReversiServer #_rows #_cols port");
+            System.exit(1);
         }
-        else
-        {
-            numRows = Integer.parseInt(args[0]);
-            numCols = Integer.parseInt(args[1]);
-            port = Integer.parseInt(args[2]);
 
-            gameIO(port, numRows, numCols);
-        }
+        numRows = Integer.parseInt(args[0]);
+        numCols = Integer.parseInt(args[1]);
+        port = Integer.parseInt(args[2]);
+
+        gameIO(port, numRows, numCols);
     }
 
     private static void gameIO(int port, int numRows, int numCols)
@@ -89,22 +88,21 @@ public class ReversiServer implements ReversiProtocol
                 if (numMoves % 2 == 1)
                 {
                     conn1Out.println(MAKE_MOVE);
-
                     move = conn1In.readLine().split(" ");
-
-                    conn2Out.println(MOVE_MADE + " " + move[1] + " " + move[2]);
                 }
                 else
                 {
                     conn2Out.println(MAKE_MOVE);
-
                     move = conn2In.readLine().split(" ");
-
-                    conn1Out.println(MOVE_MADE + " " + move[1] + " " + move[2]);
                 }
-
+                // attempts to make the move here
                 serverGame.makeMove(Integer.parseInt(move[1]), Integer.parseInt(move[2]));
+                // if there was no exception thrown we can tell each client the move was okay so they can
+                // update their versions of the game.
+                conn1Out.println(MOVE_MADE + " " + move[1] + " " + move[2]);
+                conn2Out.println(MOVE_MADE + " " + move[1] + " " + move[2]);
 
+                // DEBUGGING ONLY
                 System.out.println("A move has been made. Master game reads: ");
                 System.out.println(serverGame);
             }
