@@ -37,8 +37,16 @@ public class ReversiServer implements ReversiProtocol
         Reversi serverGame = new Reversi(numRows, numCols);
 
         ServerSocket server = null;
+
         Socket conn1 = null;
         Socket conn2 = null;
+
+        BufferedReader conn1In = null;
+        PrintWriter conn1Out = null;
+        BufferedReader conn2In = null;
+        PrintWriter conn2Out = null;
+
+        String [] move = null;
 
         try
         {
@@ -53,8 +61,8 @@ public class ReversiServer implements ReversiProtocol
             System.out.print("Waiting for player 1 to connect... ");
 
             conn1 = server.accept();
-            BufferedReader conn1In = new BufferedReader( new InputStreamReader( conn1.getInputStream() ) );
-            PrintWriter conn1Out = new PrintWriter( conn1.getOutputStream(), true );
+            conn1In = new BufferedReader( new InputStreamReader( conn1.getInputStream() ) );
+            conn1Out = new PrintWriter( conn1.getOutputStream(), true );
 
             // We tell conn1 it was connected then the numRows and numCols
             conn1Out.println(CONNECT + " " + numRows + " " + numCols);
@@ -65,34 +73,44 @@ public class ReversiServer implements ReversiProtocol
             System.out.print("Waiting for player 2 to connect... ");
 
             conn2 = server.accept();
-            BufferedReader conn2In = new BufferedReader( new InputStreamReader( conn2.getInputStream() ) );
-            PrintWriter conn2Out = new PrintWriter( conn2.getOutputStream(), true );
+            conn2In = new BufferedReader( new InputStreamReader( conn2.getInputStream() ) );
+            conn2Out = new PrintWriter( conn2.getOutputStream(), true );
 
             // We tell conn2 it was connected then the numRows and numCols
             conn2Out.println(CONNECT + " " + numRows + " " + numCols);
 
             System.out.println("connected!\nGame is starting!");
 
-            conn1Out.println(MAKE_MOVE);
-            String move1 = conn1In.readLine();
-            System.out.println(move1);
-
-            conn2Out.println(MAKE_MOVE);
-            String move2 = conn2In.readLine();
-            System.out.println(move2);
-
-            conn1Out.println(GAME_LOST);
-            conn2Out.println(GAME_WON);
-
-
-            /*
             while(!serverGame.gameOver())
             {
-                // Adds one to the number of moves made
+                // Adds one to the number of moves made (used so we know who's turn that it is currently
                 ++numMoves;
 
+                if(numMoves % 2 == 1)
+                {
+                    conn1Out.println(MAKE_MOVE);
+
+                    move = conn1In.readLine().split(" ");
+
+                    conn2Out.println(MOVE_MADE + " " + move[1] + " " + move[2]);
+                }
+                else
+                {
+                    conn2Out.println(MAKE_MOVE);
+
+                    move = conn2In.readLine().split(" ");
+
+                    conn1Out.println(MOVE_MADE + " " + move[1] + " " + move[2]);
+                }
+
+                serverGame.makeMove(Integer.parseInt(move[1]), Integer.parseInt(move[2]));
             }
-            */
+        }
+        catch(ReversiException re)
+        {
+            System.out.println("Reversi hit an issue. Halting clients.");
+            conn1Out.println(ERROR);
+            conn2Out.println(ERROR);
         }
         catch (IOException gameRunIOE)
         {
