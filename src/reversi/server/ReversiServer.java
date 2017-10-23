@@ -82,10 +82,8 @@ public class ReversiServer implements ReversiProtocol
 
             while (!serverGame.gameOver())
             {
-                // Adds one to the number of moves made (used so we know who's turn that it is currently
-                ++numMoves;
 
-                if (numMoves % 2 == 1)
+                if (numMoves % 2 == 0)
                 {
                     conn1Out.println(MAKE_MOVE);
                     move = conn1In.readLine().split(" ");
@@ -95,6 +93,7 @@ public class ReversiServer implements ReversiProtocol
                     conn2Out.println(MAKE_MOVE);
                     move = conn2In.readLine().split(" ");
                 }
+
                 // attempts to make the move here
                 serverGame.makeMove(Integer.parseInt(move[1]), Integer.parseInt(move[2]));
                 // if there was no exception thrown we can tell each client the move was okay so they can
@@ -105,6 +104,26 @@ public class ReversiServer implements ReversiProtocol
                 // DEBUGGING ONLY
                 System.out.println("A move has been made. Master game reads: ");
                 System.out.println(serverGame);
+
+                ++numMoves;
+            }
+
+            Reversi.Move winner = serverGame.getWinner();
+
+            if(winner.equals(Reversi.Move.PLAYER_ONE))
+            {
+                conn1Out.println(GAME_WON);
+                conn2Out.println(GAME_LOST);
+            }
+            else if (winner.equals(Reversi.Move.PLAYER_TWO))
+            {
+                conn2Out.println(GAME_WON);
+                conn1Out.println(GAME_LOST);
+            }
+            else
+            {
+                conn1Out.println(GAME_TIED);
+                conn2Out.println(GAME_TIED);
             }
         }
         catch (IOException gameRunIOE)
