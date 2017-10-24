@@ -84,7 +84,7 @@ public class ReversiServer implements ReversiProtocol
         catch(ReversiException re)
         {
             // do the actions if we hit a ReversiException
-            System.out.println("An error has occurred in Reversi (possibly with a move requested). Halting server and clients.");
+            System.out.println("An error has occurred in Reversi (probably with a move requested). Halting server and clients.");
             // alert the clients to stop execution
             player1Out.println(ERROR);
             player2Out.println(ERROR);
@@ -130,7 +130,7 @@ public class ReversiServer implements ReversiProtocol
         player1Out = new PrintWriter(player1.getOutputStream(), true);
         // we tell player1 it connected successfully, then tell it the number of rows and columns in the game
         player1Out.println(CONNECT + " " + numRows + " " + numCols);
-        System.out.println("connected! (player 1 located at: " + player1.getInetAddress() + ":" + player1.getPort() + ")");
+        System.out.println("successfully connected! (player 1 located at: " + player1.getInetAddress() + ":" + player1.getPort() + ")");
 
         //waits for player two to connect to server2
         System.out.print("Waiting for player 2 to connect... ");
@@ -139,7 +139,7 @@ public class ReversiServer implements ReversiProtocol
         player2Out = new PrintWriter(player2.getOutputStream(), true);
         // we tell player2 it was connected successfully then tell it the number of rows and columns in the game
         player2Out.println(CONNECT + " " + numRows + " " + numCols);
-        System.out.println("connected! (player 2 located at: " + player2.getInetAddress() + ":" + player2.getPort() + ")");
+        System.out.println("successfully connected! (player 2 located at: " + player2.getInetAddress() + ":" + player2.getPort() + ")");
     }
 
     /**
