@@ -71,7 +71,7 @@ public class ReversiServer implements ReversiProtocol
         {
             // initializes game server
             initializeGameServer(numRows, numCols, port);
-            System.out.println("Server is initialized, the game will now start!");
+            System.out.println("Server initialization completed. The game will now start.");
             // once we've initialized, we can now run the game
             runGame();
             System.out.println("The game has finished, server will now terminate.");
@@ -130,7 +130,7 @@ public class ReversiServer implements ReversiProtocol
         player1Out = new PrintWriter(player1.getOutputStream(), true);
         // we tell player1 it connected successfully, then tell it the number of rows and columns in the game
         player1Out.println(CONNECT + " " + numRows + " " + numCols);
-        System.out.println("connected!");
+        System.out.println("connected! (player 1 located at: " + player1.getInetAddress() + ":" + player1.getPort() + ")");
 
         //waits for player two to connect to server2
         System.out.print("Waiting for player 2 to connect... ");
@@ -139,7 +139,7 @@ public class ReversiServer implements ReversiProtocol
         player2Out = new PrintWriter(player2.getOutputStream(), true);
         // we tell player2 it was connected successfully then tell it the number of rows and columns in the game
         player2Out.println(CONNECT + " " + numRows + " " + numCols);
-        System.out.println("connected!");
+        System.out.println("connected! (player 2 located at: " + player2.getInetAddress() + ":" + player2.getPort() + ")");
     }
 
     /**

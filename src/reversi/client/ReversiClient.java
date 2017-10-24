@@ -172,6 +172,11 @@ public class ReversiClient implements ReversiProtocol
             System.err.println("An error has occurred while attempting to run the game. The client will now halt.");
             System.out.println(ioe.getMessage());
         }
+        // if we catch a ReversiException (somehow), we alert the user and exit the game.
+        catch (ReversiException re)
+        {
+            System.err.println("We should never get here but the server has hit an error. The client will now halt.");
+        }
     }
 
     /**
@@ -188,18 +193,13 @@ public class ReversiClient implements ReversiProtocol
      *
      * @param message The message that was received from the server.
      */
-    private static void moveMade(String [] message)
+    private static void moveMade(String [] message) throws ReversiException
     {
+        // make the move (throw the error if somehow it happens)
+        clientGame.makeMove(Integer.parseInt(message[1]), Integer.parseInt(message[2]));
+        // alert the client to the new move
         System.out.println("A move has been made in row: " + message[1] + " column: " + message[2]);
-        try
-        {
-            clientGame.makeMove(Integer.parseInt(message[1]), Integer.parseInt(message[2]));
-        }
-        // if we catch a ReversiException (somehow), we alert the user and exit the game.
-        catch (ReversiException re)
-        {
-            System.err.println("We should never get here but the server has hit an error. The client will now halt.");
-        }
+        // show the game so the user knows what's going on
         System.out.println(clientGame);
     }
 
