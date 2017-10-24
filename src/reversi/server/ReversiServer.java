@@ -146,25 +146,13 @@ public class ReversiServer implements ReversiProtocol
      */
     private static void terminateGameServer() throws IOException
     {
-        // closing player1's PrintWriter
+        // closes all of the items
         if (player1Out != null) player1Out.close();
-
-        // closing player1's BufferedReader
         if (player1In != null) player1In.close();
-
-        // closing player2's PrintWriter
         if (player2Out != null) player2Out.close();
-
-        // closing player2's BufferedReader
         if (player2In != null) player2In.close();
-
-        // closing player1 if it's not already closed
         if (player1 != null) player1.close();
-
-        // closing player2 if it's not already closed
         if (player2 != null) player2.close();
-
-        // closing server1 if it's not already closed
         if (server != null) server.close();
     }
 
