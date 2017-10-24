@@ -50,6 +50,7 @@ public class ReversiClient implements ReversiProtocol
             System.out.println("Invalid number of arguments.\nUsage: java ReversiClient host port");
             System.exit(1);
         }
+
         // this is used when its time to read in for a move
         userIn = new Scanner(System.in);
 
@@ -127,7 +128,7 @@ public class ReversiClient implements ReversiProtocol
     private static void runGame()
     {
         // used for the messages received by the server
-        String message;
+        String [] message;
         // continueRunning is used for the loop so that we know whether we need to stop or not
         // this method is preferred because we only stop once the server tells us the game is over (either through
         // ERROR or with the game result)
@@ -141,9 +142,9 @@ public class ReversiClient implements ReversiProtocol
             while (continueRunning)
             {
                 // reads in the server's message and splits it by spaces
-                message = connIn.readLine();
+                message = connIn.readLine().split(" ");
                 // has a switch on the keyword (the first index in the message array)
-                switch(message)
+                switch(message[0])
                 {
                     // if the message is MAKE_MOVE, we call the makeMove method to perform further actions
                     // NO UPDATE IS MADE TO THE CLIENT GAME, WE ONLY MODIFY OUR VERSION WHEN THE SERVER TELLS US TO
@@ -183,13 +184,12 @@ public class ReversiClient implements ReversiProtocol
      * Determines the move that was made, tells the user and updates the game that the client has.
      * @param message The message that was received from the server.
      */
-    private static void moveMade(String message)
+    private static void moveMade(String [] message)
     {
-        String [] messageSplit = message.split(" ");
-        System.out.println("A move has been made in row: " + messageSplit[1] + " column: " + messageSplit[2]);
+        System.out.println("A move has been made in row: " + message[1] + " column: " + message[2]);
         try
         {
-            clientGame.makeMove(Integer.parseInt(messageSplit[1]), Integer.parseInt(messageSplit[2]));
+            clientGame.makeMove(Integer.parseInt(message[1]), Integer.parseInt(message[2]));
         }
         // if we catch a ReversiException (somehow), we alert the user and exit the game.
         catch (ReversiException re)
@@ -203,9 +203,9 @@ public class ReversiClient implements ReversiProtocol
      * This determines which end action arrived at and alerts the user to it.
      * @param message The message that was received from the server.
      */
-    private static void endAction(String message)
+    private static void endAction(String [] message)
     {
-        switch(message)
+        switch(message[0])
         {
             // if the message is GAME_WON, tell the user they won
             case GAME_WON:

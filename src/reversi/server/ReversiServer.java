@@ -71,8 +71,10 @@ public class ReversiServer implements ReversiProtocol
         {
             // initializes game server
             initializeGameServer(numRows, numCols, port);
+            System.out.println("Server is initialized, the game will now start!");
             // once we've initialized, we can now run the game
             runGame();
+            System.out.println("The game has finished, server will now terminate.");
         }
         catch (IOException ioe)
         {
@@ -135,7 +137,7 @@ public class ReversiServer implements ReversiProtocol
         player2Out = new PrintWriter(player2.getOutputStream(), true);
         // we tell player2 it was connected successfully then tell it the number of rows and columns in the game
         player2Out.println(CONNECT + " " + numRows + " " + numCols);
-        System.out.println("connected!\nGame is starting!");
+        System.out.println("connected!");
     }
 
     /**
@@ -156,14 +158,14 @@ public class ReversiServer implements ReversiProtocol
         // closing player2's BufferedReader
         if (player2In != null) player2In.close();
 
-        // closing server1 if it's not already closed
-        if (server != null) server.close();
-
         // closing player1 if it's not already closed
         if (player1 != null) player1.close();
 
         // closing player2 if it's not already closed
         if (player2 != null) player2.close();
+
+        // closing server1 if it's not already closed
+        if (server != null) server.close();
     }
 
     /**
@@ -182,22 +184,8 @@ public class ReversiServer implements ReversiProtocol
         // continues looping until the game is over (as specified by the Reversi class)
         while (!serverGame.gameOver())
         {
-            // if numMoves is even, it is player one's turn
-            if (numMoves % 2 == 0)
-            {
-                // tells player1 it's their turn
-                player1Out.println(MAKE_MOVE);
-                // reads their response and splits it by spaces
-                message = player1In.readLine().split(" ");
-            }
-            // else it is player two's turn
-            else
-            {
-                // tells player2 it's their turn
-                player2Out.println(MAKE_MOVE);
-                // reads their response and splits it by spaces
-                message = player2In.readLine().split(" ");
-            }
+            // gets the next move from the correct player
+            message = getNextMoveFromPlayer(numMoves);
 
             // attempts to make the move requested by the client (held in move)
             // if it fails, the method throws a ReversiException to the gameIO method
@@ -244,5 +232,28 @@ public class ReversiServer implements ReversiProtocol
     {
         player1Out.println(moveMade);
         player2Out.println(moveMade);
+    }
+
+    /**
+     * Takes the number of moves that has been made and tells the appropriate player that it is their turn
+     * @param numMoves The number of moves that have been made thus far in the game.
+     * @return An array of Strings that are the tokenized move from the player
+     * @throws IOException If by come chance there was an IOException, then it is thrown by the BufferedReader or PrintWriter
+     */
+    private static String[] getNextMoveFromPlayer(int numMoves) throws IOException
+    {
+        // if numMoves is even, it is player one's turn
+        if (numMoves % 2 == 0)
+        {
+            // tells player1 it's their turn
+            player1Out.println(MAKE_MOVE);
+            // reads their response and splits it by spaces
+            return player1In.readLine().split(" ");
+        }
+        // otherwise it is player two's turn
+        // tells player2 it's their turn
+        player2Out.println(MAKE_MOVE);
+        // reads their response and splits it by spaces
+        return player2In.readLine().split(" ");
     }
 }
