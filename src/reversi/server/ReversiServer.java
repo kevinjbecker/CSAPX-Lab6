@@ -19,25 +19,25 @@ import java.net.Socket;
  */
 public class ReversiServer implements ReversiProtocol
 {
-    /** the server's ServerSocket */
+    /** the server's ServerSocket. */
     private static ServerSocket server = null;
 
-    /** the client Socket for player one */
+    /** the client Socket for player one. */
     private static Socket player1 = null;
-    /** the client Socket for player two */
+    /** the client Socket for player two. */
     private static Socket player2 = null;
 
-    /** the master game that the server bases its running off of */
+    /** the master game that the server bases its running off of. */
     private static Reversi serverGame;
 
-    /** the BufferedReader for player one */
+    /** the BufferedReader for player one. */
     private static BufferedReader player1In;
-    /** the PrintWriter for player one */
+    /** the PrintWriter for player one. */
     private static PrintWriter player1Out;
 
-    /** the BufferedReader for player two */
+    /** the BufferedReader for player two. */
     private static BufferedReader player2In;
-    /** the PrintWriter for player two */
+    /** the PrintWriter for player two. */
     private static PrintWriter player2Out;
 
     /**
@@ -108,10 +108,12 @@ public class ReversiServer implements ReversiProtocol
 
     /**
      * Builds the server and then accepts two clients.
+     *
      * @param numRows The number of rows in the Reversi game.
      * @param numCols The number of columns in the Reversi game.
      * @param port The port the server should be located on.
-     * @throws IOException When the PrintWriter or BufferedReaders encounter an issue
+     *
+     * @throws IOException When the PrintWriter or BufferedReaders encounter an issue.
      */
     private static void initializeGameServer(int numRows, int numCols, int port) throws IOException
     {
@@ -142,7 +144,8 @@ public class ReversiServer implements ReversiProtocol
 
     /**
      * Once it is time to deconstruct all of the items we needed to run the server, we do that here.
-     * @throws IOException If something goes awry with the closing of the readers, writers, or sockets
+     *
+     * @throws IOException If something goes awry with the closing of the readers, writers, or sockets.
      */
     private static void terminateGameServer() throws IOException
     {
@@ -158,9 +161,10 @@ public class ReversiServer implements ReversiProtocol
 
     /**
      * This method runs the game logic. Keeps track of whose turn it is and the moves being made.
+     *
      * @throws ReversiException An exception thrown if there was an issue in the ReversiGame. Usually occurs when a bad
-     * move has been requested (a space taken already occupied)
-     * @throws IOException An exception thrown if there was an issue communicating with Sockets (in both directions)
+     * move has been requested (a space taken already occupied).
+     * @throws IOException An exception thrown if there was an issue communicating with Sockets (in both directions).
      */
     private static void runGame() throws ReversiException, IOException
     {
@@ -214,6 +218,7 @@ public class ReversiServer implements ReversiProtocol
 
     /**
      * Sends each of the clients the move that has just been made.
+     *
      * @param moveMade The move that was just made.
      */
     private static void sendMoveMade(String moveMade)
@@ -223,10 +228,13 @@ public class ReversiServer implements ReversiProtocol
     }
 
     /**
-     * Takes the number of moves that has been made and tells the appropriate player that it is their turn
+     * Takes the number of moves that has been made and tells the appropriate player that it is their turn.
+     *
      * @param numMoves The number of moves that have been made thus far in the game.
-     * @return An array of Strings that are the tokenized move from the player
-     * @throws IOException If by come chance there was an IOException, then it is thrown by the BufferedReader or PrintWriter
+     *
+     * @return An array of Strings that are the tokenized move from the player.
+     *
+     * @throws IOException If by come chance there was an IOException, then it is thrown by the BufferedReader or PrintWriter.
      */
     private static String[] getNextMoveFromPlayer(int numMoves) throws IOException
     {

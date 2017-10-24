@@ -22,16 +22,16 @@ public class ReversiClient implements ReversiProtocol
     /** The user input scanner (used for when we're making a move. */
     private static Scanner userIn;
 
-    /** The client's dummy game that is just used for output */
+    /** The client's dummy game that is just used for output. */
     private static Reversi clientGame;
 
-    /** The connection socket that connects the client and the server */
+    /** The connection socket that connects the client and the server. */
     private static Socket conn;
 
-    /** The BufferedReader used for communication from the server */
+    /** The BufferedReader used for communication from the server. */
     private static BufferedReader connIn;
 
-    /** The PrintWriter used for communication to the server */
+    /** The PrintWriter used for communication to the server. */
     private static PrintWriter connOut;
 
 
@@ -89,11 +89,13 @@ public class ReversiClient implements ReversiProtocol
     }
 
     /**
-     * Initializes the client so that it is ready
-     * @param host The host of the ServerSocket where the ReversiServer is found
-     * @param port The port of the ServerSocket where the ReversiServer is found
-     * @throws IOException If there is an issue initializing the BufferedReader or PrintWriter
-     * @throws NumberFormatException If the port does not fit in the proper range (0-65535)
+     * Initializes the client so that it is ready.
+     *
+     * @param host The host of the ServerSocket where the ReversiServer is found.
+     * @param port The port of the ServerSocket where the ReversiServer is found.
+     *
+     * @throws IOException If there is an issue initializing the BufferedReader or PrintWriter.
+     * @throws NumberFormatException If the port does not fit in the proper range (0-65535).
      */
     private static void initializeClient(String host, int port) throws IOException, NumberFormatException
     {
@@ -111,6 +113,7 @@ public class ReversiClient implements ReversiProtocol
 
     /**
      * Terminates the client at the end of execution.
+     *
      * @throws IOException If there is an issue closing any of the IO-based items.
      */
     private static void terminateClient() throws IOException
@@ -182,6 +185,7 @@ public class ReversiClient implements ReversiProtocol
 
     /**
      * Determines the move that was made, tells the user and updates the game that the client has.
+     *
      * @param message The message that was received from the server.
      */
     private static void moveMade(String [] message)
@@ -201,6 +205,7 @@ public class ReversiClient implements ReversiProtocol
 
     /**
      * This determines which end action arrived at and alerts the user to it.
+     *
      * @param message The message that was received from the server.
      */
     private static void endAction(String [] message)
