@@ -48,6 +48,7 @@ public class ReversiClient implements ReversiProtocol
         if(args.length != 2)
         {
             System.out.println("Invalid number of arguments.\nUsage: java ReversiClient host port");
+            System.exit(1);
         }
 
         // this is used when its time to read in for a move
@@ -57,18 +58,19 @@ public class ReversiClient implements ReversiProtocol
         {
             // tries to initialize the client and then runs the game.
             initializeClient(args[0], Integer.parseInt(args[1]));
-            runGame();
+            run();
         }
         // if we catch an IOException alert the user and get the message
         catch(IOException ioe)
         {
+            System.err.println("I/O Error - " + ioe.getMessage());
             System.out.println("An error has occurred while attempting to run the game. The client will now halt.");
-            System.err.println(ioe.getMessage());
         }
         // this is only called if the port isn't in the correct range.
         catch(NumberFormatException ne)
         {
-            System.err.println("Host port must be an integer 0-65535. Client will now halt.");
+            System.err.println("Number Format Error - " + ne.getMessage());
+            System.out.println("Host port must be an integer 0-65535. Client will now halt.");
         }
         // after any catch or the end of the try we enter the finally
         finally
@@ -77,12 +79,13 @@ public class ReversiClient implements ReversiProtocol
             {
                 // try to terminate the client items
                 terminateClient();
+                System.out.println("The client has successfully terminated.");
             }
             // if we somehow catch an IOException, we tell the user it happened (very unlikely this will occur)
-            catch(IOException closeIOE)
+            catch(IOException terminateIOE)
             {
+                System.err.println("I/O Error - " + terminateIOE.getMessage());
                 System.out.println("An error has occurred while trying to terminate the client.");
-                System.err.println(closeIOE.getMessage());
             }
         }
     }
@@ -127,7 +130,7 @@ public class ReversiClient implements ReversiProtocol
     /**
      * Runs the actual game and communications between the client and server.
      */
-    private static void runGame()
+    private static void run()
     {
         // used for the messages received by the server
         String [] message;
@@ -168,13 +171,14 @@ public class ReversiClient implements ReversiProtocol
         }
         catch(IOException ioe)
         {
-            System.err.println("An error has occurred while attempting to run the game. The client will now halt.");
-            System.out.println(ioe.getMessage());
+            System.err.println("I/O Error - " + ioe.getMessage());
+            System.out.println("An error has occurred while attempting to run the game. The client will now halt.");
         }
         // if we catch a ReversiException (somehow), we alert the user and exit the game.
         catch (ReversiException re)
         {
-            System.err.println("We should never get here but the server has hit an error. The client will now halt.");
+            System.err.println("Reversi Error - " + re.getMessage());
+            System.out.println("We should never get here but the server has hit an error. The client will now halt.");
         }
     }
 
@@ -225,7 +229,7 @@ public class ReversiClient implements ReversiProtocol
                 break;
             // if the message is ERROR, tell the user about it
             case ERROR:
-                System.out.println("The server hit an issue. The game will now exit.");
+                System.out.println("The server hit an issue. The client will now halt.");
                 break;
         }
     }
