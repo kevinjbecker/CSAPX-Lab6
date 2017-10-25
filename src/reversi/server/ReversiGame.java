@@ -2,8 +2,6 @@ package reversi.server;
 
 import reversi.*;
 
-import java.net.ServerSocket;
-
 import java.io.IOException;
 
 public class ReversiGame implements ReversiProtocol

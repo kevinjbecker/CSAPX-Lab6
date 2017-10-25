@@ -172,7 +172,7 @@ public class ReversiClient implements ReversiProtocol
         catch(IOException ioe)
         {
             System.err.println("I/O Error - " + ioe.getMessage());
-            System.out.println("An error has occurred while attempting to run the game. The client will now termiante.");
+            System.out.println("An error has occurred while attempting to run the game. The client will now terminate.");
         }
         // if we catch a ReversiException (somehow), we alert the user and exit the game.
         catch (ReversiException re)
