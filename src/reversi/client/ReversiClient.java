@@ -48,7 +48,6 @@ public class ReversiClient implements ReversiProtocol
         if(args.length != 2)
         {
             System.out.println("Invalid number of arguments.\nUsage: java ReversiClient host port");
-            System.exit(1);
         }
 
         // this is used when its time to read in for a move

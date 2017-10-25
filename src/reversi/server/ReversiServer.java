@@ -2,13 +2,9 @@ package reversi.server;
 
 import reversi.*;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.IOException;
-
 import java.net.ServerSocket;
-import java.net.Socket;
+
+import java.io.IOException;
 
 
 /**
@@ -22,23 +18,14 @@ public class ReversiServer implements ReversiProtocol
     /** the server's ServerSocket. */
     private static ServerSocket server = null;
 
-    /** the client Socket for player one. */
-    private static Socket player1 = null;
-    /** the client Socket for player two. */
-    private static Socket player2 = null;
-
     /** the master game that the server bases its running off of. */
     private static Reversi serverGame;
 
-    /** the BufferedReader for player one. */
-    private static BufferedReader player1In;
-    /** the PrintWriter for player one. */
-    private static PrintWriter player1Out;
+    /** the player object for player 1. */
+    private static ReversiPlayer reversiPlayer1;
 
-    /** the BufferedReader for player two. */
-    private static BufferedReader player2In;
-    /** the PrintWriter for player two. */
-    private static PrintWriter player2Out;
+    /** the player object for player 2. */
+    private static ReversiPlayer reversiPlayer2;
 
     /**
      * The main method that checks correct
@@ -57,7 +44,6 @@ public class ReversiServer implements ReversiProtocol
         if(args.length != 3)
         {
             System.out.println("Invalid number of arguments.\nUsage: java ReversiServer #_rows #_cols port");
-            System.exit(1);
         }
 
         // sets numRows to its integer value
@@ -73,7 +59,7 @@ public class ReversiServer implements ReversiProtocol
             initializeGameServer(numRows, numCols, port);
             System.out.println("Server initialization completed. The game will now start.");
             // once we've initialized, we can now run the game
-            runGame();
+            run();
             System.out.println("The game has finished, server will now terminate.");
         }
         catch (IOException ioe)
@@ -84,10 +70,10 @@ public class ReversiServer implements ReversiProtocol
         catch(ReversiException re)
         {
             // do the actions if we hit a ReversiException
-            System.out.println("An error has occurred in Reversi (probably with a move requested). Halting server and clients.");
+            System.out.println("An error has occurred in Reversi (probably with a move request). Halting server and clients.");
             // alert the clients to stop execution
-            player1Out.println(ERROR);
-            player2Out.println(ERROR);
+            reversiPlayer1.sendError();
+            reversiPlayer2.sendError();
         }
         finally
         {
@@ -125,21 +111,14 @@ public class ReversiServer implements ReversiProtocol
 
         // waits for player one to connect to server
         System.out.print("Waiting for player 1 to connect... ");
-        player1 = server.accept();
-        player1In = new BufferedReader(new InputStreamReader(player1.getInputStream()));
-        player1Out = new PrintWriter(player1.getOutputStream(), true);
-        // we tell player1 it connected successfully, then tell it the number of rows and columns in the game
-        player1Out.println(CONNECT + " " + numRows + " " + numCols);
-        System.out.println("successfully connected! (player 1 located at: " + player1.getInetAddress() + ":" + player1.getPort() + ")");
+        reversiPlayer1 = new ReversiPlayer( server.accept(), numRows, numCols );
+        System.out.println("successfully connected! (player 1 located at: " + reversiPlayer1.getInetAddress() + ":" + reversiPlayer1.getPort() + ")");
 
         //waits for player two to connect to server2
         System.out.print("Waiting for player 2 to connect... ");
-        player2 = server.accept();
-        player2In = new BufferedReader(new InputStreamReader(player2.getInputStream()));
-        player2Out = new PrintWriter(player2.getOutputStream(), true);
-        // we tell player2 it was connected successfully then tell it the number of rows and columns in the game
-        player2Out.println(CONNECT + " " + numRows + " " + numCols);
-        System.out.println("successfully connected! (player 2 located at: " + player2.getInetAddress() + ":" + player2.getPort() + ")");
+        reversiPlayer2 = new ReversiPlayer( server.accept(), numRows, numCols );
+        // we tell reversiPlayer2 it was connected successfully then tell it the number of rows and columns in the game
+        System.out.println("successfully connected! (player 2 located at: " + reversiPlayer2.getInetAddress() + ":" + reversiPlayer2.getPort() + ")");
     }
 
     /**
@@ -150,23 +129,19 @@ public class ReversiServer implements ReversiProtocol
     private static void terminateGameServer() throws IOException
     {
         // closes all of the items
-        if (player1Out != null) player1Out.close();
-        if (player1In != null) player1In.close();
-        if (player2Out != null) player2Out.close();
-        if (player2In != null) player2In.close();
-        if (player1 != null) player1.close();
-        if (player2 != null) player2.close();
+        if (reversiPlayer1 != null) reversiPlayer1.close();
+        if (reversiPlayer2 != null) reversiPlayer2.close();
         if (server != null) server.close();
     }
 
     /**
      * This method runs the game logic. Keeps track of whose turn it is and the moves being made.
      *
-     * @throws ReversiException An exception thrown if there was an issue in the ReversiGame. Usually occurs when a bad
+     * @throws ReversiException An exception thrown if there was an issue in the Reversi game. Usually occurs when a bad
      * move has been requested (a space taken already occupied).
      * @throws IOException An exception thrown if there was an issue communicating with Sockets (in both directions).
      */
-    private static void runGame() throws ReversiException, IOException
+    private static void run() throws ReversiException, IOException
     {
         // used to tell whose move it is
         int numMoves = 0;
@@ -202,16 +177,16 @@ public class ReversiServer implements ReversiProtocol
         switch(serverGame.getWinner())
         {
             case PLAYER_ONE:
-                player1Out.println(GAME_WON);
-                player2Out.println(GAME_LOST);
+                reversiPlayer1.sendResult(GAME_WON);
+                reversiPlayer2.sendResult(GAME_LOST);
                 break;
             case PLAYER_TWO:
-                player2Out.println(GAME_WON);
-                player1Out.println(GAME_LOST);
+                reversiPlayer2.sendResult(GAME_WON);
+                reversiPlayer1.sendResult(GAME_LOST);
                 break;
             case NONE:
-                player1Out.println(GAME_TIED);
-                player2Out.println(GAME_TIED);
+                reversiPlayer1.sendResult(GAME_TIED);
+                reversiPlayer2.sendResult(GAME_TIED);
                 break;
         }
     }
@@ -223,8 +198,8 @@ public class ReversiServer implements ReversiProtocol
      */
     private static void sendMoveMade(String moveMade)
     {
-        player1Out.println(moveMade);
-        player2Out.println(moveMade);
+        reversiPlayer1.moveMade(moveMade);
+        reversiPlayer2.moveMade(moveMade);
     }
 
     /**
@@ -239,17 +214,8 @@ public class ReversiServer implements ReversiProtocol
     private static String[] getNextMoveFromPlayer(int numMoves) throws IOException
     {
         // if numMoves is even, it is player one's turn
-        if (numMoves % 2 == 0)
-        {
-            // tells player1 it's their turn
-            player1Out.println(MAKE_MOVE);
-            // reads their response and splits it by spaces
-            return player1In.readLine().split(" ");
-        }
-        // otherwise it is player two's turn
-        // tells player2 it's their turn
-        player2Out.println(MAKE_MOVE);
-        // reads their response and splits it by spaces
-        return player2In.readLine().split(" ");
+        if (numMoves % 2 == 0) return reversiPlayer1.makeMove();
+        // else it is player two's turn
+        else return reversiPlayer2.makeMove();
     }
 }
