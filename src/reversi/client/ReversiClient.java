@@ -64,13 +64,13 @@ public class ReversiClient implements ReversiProtocol
         catch(IOException ioe)
         {
             System.err.println("I/O Error - " + ioe.getMessage());
-            System.out.println("An error has occurred while attempting to run the game. The client will now halt.");
+            System.out.println("An error has occurred while attempting to run the game. The client will now terminate.");
         }
         // this is only called if the port isn't in the correct range.
         catch(NumberFormatException ne)
         {
             System.err.println("Number Format Error - " + ne.getMessage());
-            System.out.println("Host port must be an integer 0-65535. Client will now halt.");
+            System.out.println("Host port must be an integer 0-65535. Client will now terminate.");
         }
         // after any catch or the end of the try we enter the finally
         finally
@@ -172,13 +172,13 @@ public class ReversiClient implements ReversiProtocol
         catch(IOException ioe)
         {
             System.err.println("I/O Error - " + ioe.getMessage());
-            System.out.println("An error has occurred while attempting to run the game. The client will now halt.");
+            System.out.println("An error has occurred while attempting to run the game. The client will now termiante.");
         }
         // if we catch a ReversiException (somehow), we alert the user and exit the game.
         catch (ReversiException re)
         {
             System.err.println("Reversi Error - " + re.getMessage());
-            System.out.println("We should never get here but the server has hit an error. The client will now halt.");
+            System.out.println("We should never get here but the server has hit an error. The client will now terminate.");
         }
     }
 
@@ -229,7 +229,7 @@ public class ReversiClient implements ReversiProtocol
                 break;
             // if the message is ERROR, tell the user about it
             case ERROR:
-                System.out.println("The server hit an issue. The client will now halt.");
+                System.out.println("The server hit an issue. The client will now terminate.");
                 break;
         }
     }

@@ -15,10 +15,13 @@ import java.io.IOException;
  */
 public class ReversiServer implements ReversiProtocol
 {
+    /** the ServerSocket */
     private static ServerSocket server;
 
+    /** player1's ReversiPlayer */
     private static ReversiPlayer reversiPlayer1;
 
+    /** player2's ReversiPlayer */
     private static ReversiPlayer reversiPlayer2;
 
 
@@ -53,10 +56,11 @@ public class ReversiServer implements ReversiProtocol
         {
             // initializes the server
             initializeReversiServer(numRows, numCols, port);
+            // alerts that the server has finished initializing
+            System.out.print("Server initialization completed.\nBuilding game now...");
             // creates a ReversiGame object with the two ReversiPlayers, the number of rows and the number of columns
-            game = new ReversiGame(server, reversiPlayer1, reversiPlayer2, numRows, numCols);
-            // alerts that the game has finished initializing
-            System.out.println("Server initialization has completed. The game will now start.");
+            game = new ReversiGame(reversiPlayer1, reversiPlayer2, numRows, numCols);
+            System.out.println(" completed. Game will begin now.");
 
             // starts the game
             game.run();
@@ -66,25 +70,28 @@ public class ReversiServer implements ReversiProtocol
         }
         catch (IOException ioe)
         {
+            // do the actions if we hit an IOError
             System.err.println("I/O Error - " + ioe.getMessage());
-            System.out.println("An issue was encountered with IO. Halting server.");
+            System.out.println("An issue was encountered with IO. Terminating server.");
         }
         catch(ReversiException re)
         {
             // do the actions if we hit a ReversiException
             System.err.println("Reversi Error - " + re.getMessage());
-            System.out.println("An error has occurred in Reversi (probably with a requested move). Halting server and clients.");
+            System.out.println("An error has occurred in Reversi (probably with a requested move). Terminating server and clients.");
         }
         finally
         {
             try
             {
+                // we attempt to terminate the server
                 terminateReversiServer();
+                // we tell the user once the server termination completes
                 System.out.println("Server termination completed.");
             }
             catch(IOException terminateIOE)
             {
-                // if we catch an IOException here, we explode
+                // if we catch an IOException here, we explode (a.k.a. it shouldn't happen)
                 System.err.println("I/O Error - " + terminateIOE.getMessage());
                 System.out.println("An error has occurred while terminating server.");
                 terminateIOE.printStackTrace();
@@ -92,6 +99,15 @@ public class ReversiServer implements ReversiProtocol
         }
     }
 
+    /**
+     * Creates a server which is used to communicate between two players.
+     *
+     * @param numRows The number of rows in the Reversi game.
+     * @param numCols The number of columns in the Reversi game.
+     * @param port The port that the server should be created on.
+     *
+     * @throws IOException If there is an IOException, it is thrown out to the calling method.
+     */
     private static void initializeReversiServer(int numRows, int numCols, int port) throws IOException
     {
         // sets the server to a new ServerSocket on port
@@ -110,10 +126,18 @@ public class ReversiServer implements ReversiProtocol
         System.out.println("successfully connected! (player 2 located at: " + reversiPlayer2.getInetAddress() + ":" + reversiPlayer2.getPort() + ")");
     }
 
+    /**
+     * Attempts to close all of the open objects at the end of execution.
+     *
+     * @throws IOException If there is an IOException, it is thrown out to the calling method.
+     */
     private static void terminateReversiServer() throws IOException
     {
+        // closes reversiPlayer1
         if (reversiPlayer1 != null) reversiPlayer1.close();
+        // closes reversiPlayer2
         if (reversiPlayer2 != null) reversiPlayer2.close();
+        // closes the server
         if (server != null) server.close();
     }
 }

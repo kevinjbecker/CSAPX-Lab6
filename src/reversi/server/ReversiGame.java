@@ -11,9 +11,6 @@ public class ReversiGame implements ReversiProtocol
     /** the number of moves that have been made so far*/
     private int numMoves = 0;
 
-    /** the server's ServerSocket */
-    private ServerSocket server;
-
     /** the master game that the server bases its running off of. */
     private Reversi serverGame;
 
@@ -31,10 +28,8 @@ public class ReversiGame implements ReversiProtocol
      * @param numRows The number of rows in the Reversi game.
      * @param numCols The number of columns in the Reversi game.
      */
-    ReversiGame(ServerSocket server, ReversiPlayer reversiPlayer1, ReversiPlayer reversiPlayer2, int numRows, int numCols)
+    ReversiGame(ReversiPlayer reversiPlayer1, ReversiPlayer reversiPlayer2, int numRows, int numCols)
     {
-        this.server = server;
-
         // sets the serverGame to the game given as an argument
         this.serverGame = new Reversi(numRows, numCols);
 
